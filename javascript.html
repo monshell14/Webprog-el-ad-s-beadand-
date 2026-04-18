@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Net Pizzéria - Pizza Kezelés</title>
+    <style>
+        :root {
+            --primary: #d84315;
+            --secondary: #f39c12;
+            --bg: #fff9f0;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-container {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            border: 1px solid #eee;
+        }
+
+        input, select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #bf360c;
+            transform: translateY(-2px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background-color: #fffde7;
+        }
+
+        .vega-tag {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .btn-del {
+            background-color: #e74c3c;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        .count-info {
+            text-align: right;
+            margin-bottom: 10px;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🍕 Net Pizzéria Nyilvántartás</h1>
+        <p>JavaScript CRUD alkalmazás - Pizza adatbázis</p>
+    </header>
+
+    <div class="form-container">
+        <input type="text" id="pName" placeholder="Pizza neve..." style="flex: 2;">
+        <select id="pCat">
+            <option value="apród">apród</option>
+            <option value="főnemes">főnemes</option>
+            <option value="király">király</option>
+            <option value="lovag">lovag</option>
+        </select>
+        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+            <input type="checkbox" id="pVega"> Vegetáriánus
+        </label>
+        <button onclick="addPizza()">Hozzáadás</button>
+    </div>
+
+    <div class="count-info" id="pCount"></div>
+
+    <table id="pizzaTable">
+        <thead>
+            <tr>
+                <th>Név</th>
+                <th>Kategória</th>
+                <th>Típus</th>
+                <th>Művelet</th>
+            </tr>
+        </thead>
+        <tbody id="pBody">
+            <!-- Ide kerülnek a pizzák -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // A teljes 73 darabos adatbázisod
+    let pizzas = [
+        { nev: "Áfonyás", kateg: "király", vega: 0 },
+        { nev: "Babos", kateg: "lovag", vega: 0 },
+        { nev: "Barbecue chicken", kateg: "lovag", vega: 0 },
+        { nev: "Betyáros", kateg: "király", vega: 0 },
+        { nev: "Caribi", kateg: "apród", vega: 0 },
+        { nev: "Country", kateg: "király", vega: 0 },
+        { nev: "Csabesz", kateg: "király", vega: 0 },
+        { nev: "Csupa sajt", kateg: "lovag", vega: 1 },
+        { nev: "Erdő kapitánya", kateg: "apród", vega: 0 },
+        { nev: "Erős János", kateg: "lovag", vega: 0 },
+        { nev: "Excellent", kateg: "király", vega: 0 },
+        { nev: "Főnök kedvence", kateg: "lovag", vega: 0 },
+        { nev: "Francia", kateg: "főnemes", vega: 0 },
+        { nev: "Frankfurti", kateg: "király", vega: 0 },
+        { nev: "Füstös", kateg: "lovag", vega: 0 },
+        { nev: "Gino", kateg: "király", vega: 0 },
+        { nev: "Gombás", kateg: "apród", vega: 1 },
+        { nev: "Góré", kateg: "lovag", vega: 0 },
+        { nev: "Görög", kateg: "király", vega: 0 },
+        { nev: "Gyros pizza", kateg: "király", vega: 0 },
+        { nev: "HamAndEggs", kateg: "lovag", vega: 0 },
+        { nev: "Hamm", kateg: "lovag", vega: 0 },
+        { nev: "Hawaii", kateg: "főnemes", vega: 0 },
+        { nev: "Hellas", kateg: "király", vega: 0 },
+        { nev: "Hercegnő", kateg: "király", vega: 0 },
+        { nev: "Ilike", kateg: "lovag", vega: 0 },
+        { nev: "Ínyenc", kateg: "lovag", vega: 0 },
+        { nev: "Jázmin álma", kateg: "lovag", vega: 0 },
+        { nev: "Jobbágy", kateg: "király", vega: 0 },
+        { nev: "Juhtúrós", kateg: "lovag", vega: 0 },
+        { nev: "Kagylós", kateg: "király", vega: 0 },
+        { nev: "Kétszínű", kateg: "lovag", vega: 0 },
+        { nev: "Kiadós", kateg: "király", vega: 0 },
+        { nev: "Király pizza", kateg: "király", vega: 0 },
+        { nev: "Kívánság", kateg: "lovag", vega: 1 },
+        { nev: "Kolbászos", kateg: "apród", vega: 0 },
+        { nev: "Lagúna", kateg: "király", vega: 1 },
+        { nev: "Lecsó", kateg: "király", vega: 0 },
+        { nev: "Maffiózó", kateg: "lovag", vega: 0 },
+        { nev: "Magvas", kateg: "király", vega: 1 },
+        { nev: "Magyaros", kateg: "lovag", vega: 0 },
+        { nev: "Máj Fair Lady", kateg: "király", vega: 0 },
+        { nev: "Mamma fia", kateg: "király", vega: 0 },
+        { nev: "Mexikói", kateg: "főnemes", vega: 0 },
+        { nev: "Mixi", kateg: "főnemes", vega: 1 },
+        { nev: "Nikó", kateg: "király", vega: 0 },
+        { nev: "Nordic", kateg: "király", vega: 0 },
+        { nev: "Nyuszó-Muszó", kateg: "király", vega: 0 },
+        { nev: "Pacalos", kateg: "lovag", vega: 0 },
+        { nev: "Pástétomos", kateg: "király", vega: 0 },
+        { nev: "Pásztor", kateg: "lovag", vega: 0 },
+        { nev: "Pipis", kateg: "lovag", vega: 0 },
+        { nev: "Popey", kateg: "király", vega: 0 },
+        { nev: "Quattro", kateg: "király", vega: 0 },
+        { nev: "Ráki", kateg: "király", vega: 0 },
+        { nev: "Rettenetes magyar", kateg: "lovag", vega: 0 },
+        { nev: "Röfi", kateg: "király", vega: 0 },
+        { nev: "Sajtos", kateg: "apród", vega: 1 },
+        { nev: "So-ku", kateg: "apród", vega: 0 },
+        { nev: "Son-go-ku", kateg: "főnemes", vega: 1 },
+        { nev: "Sonkás", kateg: "apród", vega: 0 },
+        { nev: "Spanyol", kateg: "király", vega: 0 },
+        { nev: "Spencer", kateg: "főnemes", vega: 0 },
+        { nev: "Szalámis", kateg: "apród", vega: 0 },
+        { nev: "Szardíniás", kateg: "lovag", vega: 0 },
+        { nev: "Szerzetes", kateg: "király", vega: 0 },
+        { nev: "Szőke kapitány", kateg: "király", vega: 0 },
+        { nev: "Tenger gyümölcsei", kateg: "király", vega: 0 },
+        { nev: "Tonhalas", kateg: "lovag", vega: 0 },
+        { nev: "Törperős", kateg: "lovag", vega: 0 },
+        { nev: "Tündi kedvence", kateg: "király", vega: 0 },
+        { nev: "Tüzes halál", kateg: "király", vega: 0 },
+        { nev: "Vega", kateg: "lovag", vega: 1 },
+        { nev: "Zöldike", kateg: "főnemes", vega: 1 }
+    ];
+
+    function render() {
+        const tbody = document.getElementById('pBody');
+        const pCount = document.getElementById('pCount');
+        tbody.innerHTML = '';
+        
+        pizzas.forEach((p, i) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${p.nev}</strong></td>
+                <td>${p.kateg}</td>
+                <td>${p.vega == 1 ? '<span class="vega-tag">🌿 Vega</span>' : '🥩 Húsos'}</td>
+                <td><button class="btn-del" onclick="delPizza(${i})">Törlés</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+        
+        pCount.innerText = `Összesen: ${pizzas.length} pizza található a listában`;
+    }
+
+    function addPizza() {
+        const nameInput = document.getElementById('pName');
+        const catInput = document.getElementById('pCat');
+        const vegaInput = document.getElementById('pVega');
+
+        if (nameInput.value.trim() === '') {
+            alert('Kérlek adj meg egy nevet!');
+            return;
+        }
+
+        const newPizza = {
+            nev: nameInput.value,
+            kateg: catInput.value,
+            vega: vegaInput.checked ? 1 : 0
+        };
+
+        pizzas.unshift(newPizza); // Az elejére szúrja be
+        nameInput.value = '';
+        vegaInput.checked = false;
+        render();
+    }
+
+    function delPizza(index) {
+        if(confirm('Biztosan törlöd ezt a pizzát?')) {
+            pizzas.splice(index, 1);
+            render();
+        }
+    }
+
+    // Első betöltés
+    render();
+</script>
+
+</body>
+</html>

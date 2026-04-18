@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>OOJS - Pattogó Pizzák</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #2c3e50; /* Sötét háttér, hogy látszódjanak */
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        button { cursor: pointer; padding: 8px 15px; background: #d84315; color: white; border: none; border-radius: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="ui">
+        <h2 style="margin-top:0; color:#d84315;">🍕 OOJS Animáció</h2>
+        <p>Class, Constructor, Extends, Super használatával</p>
+        <button onclick="ujPizza()">+ Új Pizza</button>
+        <a href="index.html" style="margin-left: 10px; color: #333;">Vissza a főoldalra</a>
+    </div>
+
+<script>
+    // 1. ŐSOSZTÁLY (Alakzat)
+    class Alakzat {
+        constructor() {
+            this.div = document.createElement('div');
+            this.size = Math.random() * 40 + 30;
+            this.x = Math.random() * (window.innerWidth - this.size);
+            this.y = Math.random() * (window.innerHeight - this.size);
+            this.vx = (Math.random() - 0.5) * 8; // Sebesség X
+            this.vy = (Math.random() - 0.5) * 8; // Sebesség Y
+
+            this.div.style.position = 'absolute';
+            this.div.style.width = this.size + 'px';
+            this.div.style.height = this.size + 'px';
+            this.div.style.display = 'flex';
+            this.div.style.alignItems = 'center';
+            this.div.style.justifyContent = 'center';
+            this.div.style.fontSize = (this.size * 0.8) + 'px';
+            
+            document.body.appendChild(this.div); // document.body.appendChild használata
+        }
+
+        move() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Visszapattanás a falakról
+            if (this.x <= 0 || this.x >= window.innerWidth - this.size) this.vx *= -1;
+            if (this.y <= 0 || this.y >= window.innerHeight - this.size) this.vy *= -1;
+
+            this.div.style.left = this.x + 'px';
+            this.div.style.top = this.y + 'px';
+        }
+    }
+
+    // 2. SZÁRMAZTATOTT OSZTÁLY (extends Pizza)
+    class Pizza extends Alakzat {
+        constructor(emoji) {
+            super(); // Meghívja az Alakzat constructorát (super használata)
+            this.div.innerHTML = emoji;
+            this.rotation = 0;
+        }
+
+        // Egyedi metódus a pörgéshez
+        spin() {
+            this.rotation += 5;
+            this.div.style.transform = `rotate(${this.rotation}deg)`;
+        }
+    }
+
+    // Alkalmazás logika
+    const elemek = [];
+
+    // Kezdő készlet létrehozása
+    for(let i=0; i < 15; i++) {
+        elemek.push(new Pizza(i % 2 === 0 ? '🍕' : '🥗'));
+    }
+
+    function ujPizza() {
+        elemek.push(new Pizza('🍕'));
+    }
+
+    // Frissítési ciklus
+    function animate() {
+        elemek.forEach(p => {
+            p.move(); // Alakzat metódus
+            p.spin(); // Pizza metódus
+        });
+        requestAnimationFrame(animate);
+    }
+
+    animate(); // Indítás
+</script>
+</body>
+</html>

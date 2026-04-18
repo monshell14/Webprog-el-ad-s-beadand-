@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Net Pizzéria - Rendelési Napló</title>
+    <style>
+        :root {
+            --primary: #d84315;
+            --bg: #fff9f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .info-text {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #filter {
+            padding: 12px 20px;
+            width: 60%;
+            max-width: 400px;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        #filter:focus {
+            border-color: var(--primary);
+        }
+
+        .scroll-box {
+            max-height: 550px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            background: #fff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead th {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-align: left;
+        }
+
+        tbody td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fdf2e9;
+        }
+
+        tbody tr:hover {
+            background-color: #fce4d6;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Betöltés jelző */
+        #status {
+            text-align: center;
+            font-weight: bold;
+            color: #d84315;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📋 Rendelési Napló (Fetch API)</h1>
+    <p class="info-text">Összesen 21.800 bejegyzés lekérése az adatbázisból.</p>
+
+    <div class="search-container">
+        <input type="text" id="filter" placeholder="Keresés pizza név alapján..." onkeyup="filterTable()">
+    </div>
+
+    <div id="status">Adatok betöltése...</div>
+
+    <div class="scroll-box" id="tableBox" style="display:none;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Pizza neve</th>
+                    <th>Mennyiség</th>
+                    <th>Rendelés felvétele</th>
+                    <th>Kiszállítás ideje</th>
+                </tr>
+            </thead>
+            <tbody id="orderRows"></tbody>
+        </table>
+    </div>
+    
+    <a href="index.html" class="back-link">← Vissza a főoldalra</a>
+</div>
+
+<script>
+    async function loadOrders() {
+        const statusDiv = document.getElementById('status');
+        const tableBox = document.getElementById('tableBox');
+        const tbody = document.getElementById('orderRows');
+
+        try {
+            // Itt hívjuk meg a PHP-t
+            const res = await fetch('api/rendelesek.php');
+            
+            if (!res.ok) throw new Error("A szerver nem válaszol (HTTP " + res.status + ")");
+            
+            const data = await res.json();
+
+            if (data.length === 0) {
+                statusDiv.innerText = "Az adatbázis üres.";
+                return;
+            }
+
+            tbody.innerHTML = '';
+            data.forEach(r => {
+                // Biztonsági ellenőrzés az oszlopnevekre
+                const nev = r.pizzanev || r.nev || "Névtelen";
+                const db = r.darab || r.mennyiseg || 0;
+                const felv = r.felvetel || "";
+                const kisz = r.kiszallitas || "";
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${nev}</strong></td>
+                    <td>${db} db</td>
+                    <td>${felv}</td>
+                    <td>${kisz}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            statusDiv.style.display = 'none';
+            tableBox.style.display = 'block';
+
+        } catch (err) {
+            statusDiv.innerHTML = "❌ Hiba történt: " + err.message + "<br><small>Ellenőrizd az XAMPP-ot és a rendelesek.php-t!</small>";
+            console.error("Fetch hiba:", err);
+        }
+    }
+
+    function filterTable() {
+        const input = document.getElementById("filter").value.toUpperCase();
+        const rows = document.getElementById("orderRows").getElementsByTagName("tr");
+        
+        for (let i = 0; i < rows.length; i++) {
+            const pizzaName = rows[i].cells[0].textContent || rows[i].cells[0].innerText;
+            if (pizzaName.toUpperCase().indexOf(input) > -1) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+
+    // Alkalmazás indítása
+    window.onload = loadOrders;
+</script>
+
+</body>
+</html>

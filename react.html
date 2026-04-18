@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Kategória CRUD (React)</title>
+    <!-- React és Babel betöltése -->
+    <script src="https://unpkg.com" crossorigin></script>
+    <script src="https://unpkg.com" crossorigin></script>
+    <script src="https://unpkg.com"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; display: flex; justify-content: center; }
+        #root { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); width: 100%; max-width: 500px; min-height: 200px; }
+        h1 { color: #2c3e50; text-align: center; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-add { background: #27ae60; color: white; }
+        .item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+        .btn-del { background: #e74c3c; color: white; padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <div id="root">Betöltés... (Ha ez marad itt, ellenőrizd az internetkapcsolatot)</div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function App() {
+            const [items, setItems] = useState([
+                { nev: "apród", ar: 850 },
+                { nev: "főnemes", ar: 950 },
+                { nev: "király", ar: 1250 },
+                { nev: "lovag", ar: 1150 }
+            ]);
+            const [name, setName] = useState('');
+            const [price, setPrice] = useState('');
+
+            const add = () => {
+                if(name && price) {
+                    setItems([...items, { nev: name, ar: parseInt(price) }]);
+                    setName(''); setPrice('');
+                }
+            };
+
+            return (
+                <div>
+                    <h1>👑 Kategória Árak</h1>
+                    <div className="input-group">
+                        <input value={name} onChange={e => setName(e.target.value)} placeholder="Név" />
+                        <input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="Ár" />
+                        <button className="btn-add" onClick={add}>Hozzáadás</button>
+                    </div>
+                    <div>
+                        {items.map((item, i) => (
+                            <div key={i} className="item">
+                                <span><strong>{item.nev}</strong>: {item.ar} Ft</span>
+                                <button className="btn-del" onClick={() => setItems(items.filter((_, idx) => idx !== i))}>Törlés</button>
+                            </div>
+                        ))}
+                    </div>
+                    <div style={{marginTop: '20px', textAlign: 'center'}}>
+                        <a href="index.html" style={{color: '#d84315', textDecoration: 'none'}}>← Vissza a főoldalra</a>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
