@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Net Pizzéria - Webprogramozás Házi Feladat</title>
+    <style>
+        :root { --primary: #d84315; --secondary: #f39c12; --dark: #333; --light: #fff9f0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: var(--light); color: #333; line-height: 1.6; }
+        header { background: var(--primary); color: white; padding: 40px 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        nav { background: var(--dark); padding: 15px; text-align: center; position: sticky; top: 0; z-index: 1000; }
+        nav a { color: white; margin: 0 12px; text-decoration: none; font-weight: bold; font-size: 0.95rem; transition: 0.3s; padding: 5px 10px; border-radius: 5px; }
+        nav a:hover { background: var(--primary); color: white; }
+        .container { max-width: 1000px; margin: 40px auto; padding: 30px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 30px; }
+        .card { padding: 20px; border: 1px solid #eee; border-radius: 10px; transition: 0.3s; background: #fff; text-align: center; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .doc-section { text-align: left; background: #fdf2e9; padding: 25px; border-radius: 15px; border: 1px solid #e67e22; margin-top: 40px; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; background: white; }
+        th, td { border: 1px solid #ddd; padding: 10px; font-size: 14px; }
+        th { background: #e67e22; color: white; }
+        .diagram { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .db-box { border: 2px solid #333; padding: 10px; background: #eee; border-radius: 5px; font-family: monospace; font-size: 12px; }
+        footer { background: var(--dark); color: #ccc; text-align: center; padding: 30px 20px; margin-top: 60px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Web programozás-1 Előadás Házi feladat</h1>
+    </header>
+    
+    <nav>
+        <a href="index.html">Főoldal</a>
+        <a href="javascript.html">1. JS CRUD</a>
+        <a href="react/dist/index.html">2-3. React CRUD</a>
+        <a href="react/dist/index.html">4. SPA Menü</a>
+        <a href="fetchapi.html">5. Fetch API</a>
+        <a href="react/dist/index.html">6. Axios (React)</a>
+        <a href="oojs.html">7. OOJS Animáció</a>
+    </nav>
+
+    <div class="container">
+        <h2 style="text-align: center; color: var(--primary);">🍕 Net Pizzéria Adminisztrációs Rendszer</h2>
+        <p style="text-align: center;">Ez a komplex webalkalmazás bemutatja a kurzus során elsajátított technológiákat a szerveroldali API kezelésig.</p>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>Kliens oldali kezelés</h3>
+                <p>JavaScript és React állapotkezelés.</p>
+            </div>
+            <div class="card">
+                <h3>Szerver oldali API</h3>
+                <p>MySQL elérése Fetch és Axios technológiákkal.</p>
+            </div>
+            <div class="card">
+                <h3>Objektumorientált JS</h3>
+                <p>Grafikus animáció osztályokkal.</p>
+            </div>
+        </div>
+
+        <!-- DOKUMENTÁCIÓS RÉSZ -->
+        <div class="doc-section">
+            <h3 style="text-align: center; color: #d84315;">📊 Adatbázis Dokumentáció</h3>
+            
+            <h4>1. pizza tábla</h4>
+            <table>
+                <tr><th>Mező</th><th>Leírás</th></tr>
+                <tr><td><strong>nev</strong></td><td>a pizza neve (szöveg), ez a kulcs</td></tr>
+                <tr><td><strong>kategorianev</strong></td><td>a pizza kategóriája (szöveg)</td></tr>
+                <tr><td><strong>vegetarianus</strong></td><td>logikai érték (igaz/hamis)</td></tr>
+            </table>
+
+            <h4>2. kategoria tábla</h4>
+            <table>
+                <tr><th>Mező</th><th>Leírás</th></tr>
+                <tr><td><strong>nev</strong></td><td>a kategória neve (szöveg), ez a kulcs</td></tr>
+                <tr><td><strong>ar</strong></td><td>a kategória ára (szám)</td></tr>
+            </table>
+
+            <h4>3. rendeles tábla</h4>
+            <table>
+                <tr><th>Mező</th><th>Leírás</th></tr>
+                <tr><td><strong>az</strong></td><td>rendelés azonosítója (számláló), kulcs</td></tr>
+                <tr><td><strong>pizzanev</strong></td><td>rendelt pizza neve (szöveg)</td></tr>
+                <tr><td><strong>darab</strong></td><td>mennyiség (szám)</td></tr>
+                <tr><td><strong>felvetel</strong></td><td>felvétel időpontja (dátum)</td></tr>
+            </table>
+
+            <h4 style="text-align: center;">🔗 Kapcsolati diagram</h4>
+            <div class="diagram">
+                <div class="db-box">kategoria<br><hr>nev (PK)<br>ar</div>
+                <span>➔</span>
+                <div class="db-box">pizza<br><hr>nev (PK)<br>kategorianev (FK)<br>veg</div>
+                <span>➔</span>
+                <div class="db-box">rendeles<br><hr>az (PK)<br>pizzanev (FK)<br>darab</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Készítette: <strong>Terneszné Szabó Mónika</strong></p>
+        <p>Neptun kód: <strong>DG84ZI</strong></p>
+        <p>© 2026 - Web programozás-1 Előadás</p>
+    </footer>
+
+</body>
